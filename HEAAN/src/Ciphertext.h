@@ -19,8 +19,8 @@ using namespace NTL;
 class Ciphertext {
 public:
 
-	ZZ* ax = new ZZ[N];
-	ZZ* bx = new ZZ[N];
+	ZZ* ax;
+	ZZ* bx;
 
 	long logp;
 	long logq;
@@ -30,6 +30,12 @@ public:
 	Ciphertext(long logp = 0, long logq = 0, long n = 0);
 
 	Ciphertext(const Ciphertext& o);
+
+	Ciphertext(Ciphertext&&);
+
+	Ciphertext& operator =(const Ciphertext&);
+
+    Ciphertext& operator =(Ciphertext&&);
 
 	void copyParams(Ciphertext& o);
 

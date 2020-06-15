@@ -9,15 +9,53 @@
 
 #include <NTL/tools.h>
 
-Ciphertext::Ciphertext(long logp, long logq, long n) : logp(logp), logq(logq), n(n) {
+Ciphertext::Ciphertext(long logp, long logq, long n) : ax(new ZZ[N]), bx(new ZZ[N]), logp(logp), logq(logq), n(n) {
 }
 
-Ciphertext::Ciphertext(const Ciphertext& o) : logp(o.logp), logq(o.logq), n(o.n) {
+Ciphertext::Ciphertext(const Ciphertext& o) : ax(new ZZ[N]), bx(new ZZ[N]), logp(o.logp), logq(o.logq), n(o.n) {
 	for (long i = 0; i < N; ++i) {
 		ax[i] = o.ax[i];
 		bx[i] = o.bx[i];
 	}
 }
+
+Ciphertext::Ciphertext(Ciphertext&& o) : ax(o.ax), bx(o.bx), logp(o.logp), logq(o.logq), n(o.n) {
+    o.ax = nullptr;
+    o.bx = nullptr;
+}
+
+Ciphertext& Ciphertext::operator =(const Ciphertext& o) {
+    for (long i = 0; i < N; ++i) {
+        ax[i] = o.ax[i];
+        bx[i] = o.bx[i];
+    }
+    logp = o.logp;
+    logq = o.logq;
+    n = o.n;
+
+    return *this;
+}
+
+Ciphertext& Ciphertext::operator =(Ciphertext&& o) {
+    if(ax != nullptr) {
+        delete[] ax;
+    }
+    if(bx != nullptr) {
+        delete[] bx;
+    }
+
+    ax = o.ax;
+    bx = o.bx;
+    logp = o.logp;
+    logq = o.logq;
+    n = o.n;
+
+    o.ax = nullptr;
+    o.bx = nullptr;
+
+    return *this;
+}
+
 
 void Ciphertext::copyParams(Ciphertext& o) {
 	logp = o.logp;
@@ -41,6 +79,10 @@ void Ciphertext::free() {
 }
 
 Ciphertext::~Ciphertext() {
-	delete[] ax;
-	delete[] bx;
+    if(ax != nullptr) {
+        delete[] ax;
+    }
+    if(bx != nullptr) {
+        delete[] bx;
+    }
 }
